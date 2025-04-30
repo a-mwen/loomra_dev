@@ -70,11 +70,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setError(response.data.error || 'Login failed');
         return false;
       }
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.error || 'An error occurred during login';
+    } catch (err) {
+      const errorMessage = axios.isAxiosError(err) && err.response?.data?.error
+        ? err.response.data.error
+        : 'An error occurred during login';
       setError(errorMessage);
       return false;
-    } finally {
+    }
+     finally {
       setIsLoading(false);
     }
   };
@@ -95,11 +98,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setError(response.data.error || 'Registration failed');
         return false;
       }
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.error || 'An error occurred during registration';
+    } catch (err) {
+      const errorMessage = axios.isAxiosError(err) && err.response?.data?.error
+        ? err.response.data.error
+        : 'An error occurred during login';
       setError(errorMessage);
       return false;
-    } finally {
+    }
+     finally {
       setIsLoading(false);
     }
   };
