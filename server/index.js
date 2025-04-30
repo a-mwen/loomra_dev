@@ -1,14 +1,15 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import pg from 'pg';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import multer from 'multer';
-import { parse } from 'csv-parser';
-import { createReadStream } from 'fs';
-import { Transform } from 'stream';
-import { Parser } from 'json2csv';
+const express = require('express');
+const cors = require('cors');
+const dotenv = require('dotenv');
+const pg = require('pg');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const multer = require('multer');
+const { parse } = require('csv-parse');
+const { createReadStream } = require('fs');
+const { Transform } = require('stream');
+const { Parser } = require('json2csv');
+
 
 // Load environment variables
 dotenv.config();
@@ -23,7 +24,7 @@ app.use(express.json());
 // Setup PostgreSQL connection
 const { Pool } = pg;
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/loomra',
+  connectionString: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5437/loomra',
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
 
@@ -768,3 +769,4 @@ app.get('/api/clients/export', authenticateToken, async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+console.log("Using DB URL:", process.env.DATABASE_URL);
