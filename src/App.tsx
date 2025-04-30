@@ -1,74 +1,48 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AppProviders } from './context';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { Suspense, lazy } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './contexts/AuthContext';
+import Layout from './components/layout/Layout';
+import Loading from './components/ui/Loading';
+import PublicRoute from './components/routing/PublicRoute';
+import PrivateRoute from './components/routing/PrivateRoute';
 
-// Auth Pages
-import Login from './pages/auth/Login';
-import Register from './pages/auth/Register';
-import ForgotPassword from './pages/auth/ForgotPassword';
-
-// Main Layout
-import MainLayout from './components/layout/MainLayout';
-
-// Protected Route Component
-import ProtectedRoute from './components/auth/ProtectedRoute';
-
-// Main Pages
-import Dashboard from './pages/Dashboard';
-import Clients from './pages/clients/Clients';
-import ClientDetails from './pages/clients/ClientDetails';
-import Tasks from './pages/tasks/Tasks';
-import Meetings from './pages/meetings/Meetings';
-import Notes from './pages/notes/Notes';
-import Analytics from './pages/analytics/Analytics';
-import Settings from './pages/settings/Settings';
-import NotFound from './pages/NotFound';
+// Lazy loaded components
+const Login = lazy(() => import('./pages/auth/Login'));
+const Register = lazy(() => import('./pages/auth/Register'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Clients = lazy(() => import('./pages/clients/Clients'));
+const ClientDetails = lazy(() => import('./pages/clients/ClientDetails'));
+const Tasks = lazy(() => import('./pages/tasks/Tasks'));
+const Meetings = lazy(() => import('./pages/meetings/Meetings'));
+const Settings = lazy(() => import('./pages/Settings'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 function App() {
+  const { isLoading } = useAuth();
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
-    <AppProviders>
-      <BrowserRouter>
-        <Routes>
-          {/* Auth Routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          
-          {/* Protected Routes */}
-          <Route element={<ProtectedRoute />}>
-            <Route element={<MainLayout />}>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/clients" element={<Clients />} />
-              <Route path="/clients/:id" element={<ClientDetails />} />
-              <Route path="/tasks" element={<Tasks />} />
-              <Route path="/meetings" element={<Meetings />} />
-              <Route path="/notes" element={<Notes />} />
-              <Route path="/analytics" element={<Analytics />} />
-              <Route path="/settings" element={<Settings />} />
-            </Route>
-          </Route>
-          
-          {/* Redirect and Not Found */}
-          <Route path="/home" element={<Navigate to="/" replace />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-      
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
-    </AppProviders>
+    <Suspense fallback={<Loading />}>
+      <Routes>
+        <Route path="/" element={<PublicRoute><Login /></PublicRoute>} />
+        <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+        
+        <Route element={<PrivateRoute><Layout /></PrivateRoute>}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/clients" element={<Clients />} />
+          <Route path="/clients/:id" element={<ClientDetails />} />
+          <Route path="/tasks" element={<Tasks />} />
+          <Route path="/meetings" element={<Meetings />} />
+          <Route path="/settings" element={<Settings />} />
+        </Route>
+        
+        <Route path="/404" element={<NotFound />} />
+        <Route path="*" element={<Navigate to="/404" replace />} />
+      </Routes>
+    </Suspense>
   );
 }
 
