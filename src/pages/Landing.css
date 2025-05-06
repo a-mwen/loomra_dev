@@ -1,0 +1,40 @@
+/* src/pages/Landing.css */
+.landing-container {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 50px;
+  }
+  
+  .landing-header {
+    background-color: #f5f5f5;
+    padding: 40px 20px;
+  }
+  
+  .landing-buttons {
+    margin-top: 20px;
+  }
+  
+  .landing-button {
+    display: inline-block;
+    margin: 0 10px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+  }
+  
+  .landing-button:hover {
+    background-color: #0056b3;
+  }
+  
+  .landing-features {
+    margin: 40px 0;
+  }
+  
+  .landing-footer {
+    margin-top: 60px;
+    font-size: 14px;
+    color: #777;
+  }
+  

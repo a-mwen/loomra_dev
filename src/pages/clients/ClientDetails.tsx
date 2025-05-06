@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calendar, CheckSquare, Edit, FileText, MoreHorizontal, Plus, Tag, Trash2, Users } from 'lucide-react';
+import { ArrowLeft, Calendar, CheckSquare, Edit, FileText, MoreHorizontal, Plus, Trash2, Users } from 'lucide-react';
 import axios from 'axios';
 import { API_URL, DEFAULT_CLIENT_TAGS } from '../../config/constants';
 
@@ -459,16 +459,18 @@ const ClientDetails = () => {
                     <p className="text-sm font-medium text-gray-900 dark:text-white">Schedule Meeting</p>
                   </div>
                 </Link>
-                <button
-                  className="w-full flex items-center p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/30 border border-gray-200 dark:border-gray-700"
-                >
-                  <div className="p-2 bg-primary-50 dark:bg-primary-900/20 rounded-md">
-                    <FileText className="h-4 w-4 text-primary-600 dark:text-primary-400" />
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">Add Note</p>
-                  </div>
-                </button>
+                <Link
+  to={`/notes?client=${id}`}
+  className="w-full flex items-center p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/30 border border-gray-200 dark:border-gray-700"
+>
+  <div className="p-2 bg-primary-50 dark:bg-primary-900/20 rounded-md">
+    <FileText className="h-4 w-4 text-primary-600 dark:text-primary-400" />
+  </div>
+  <div className="ml-3">
+    <p className="text-sm font-medium text-gray-900 dark:text-white">Add Note</p>
+  </div>
+</Link>
+
               </div>
             </div>
           </div>

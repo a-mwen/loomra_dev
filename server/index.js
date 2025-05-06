@@ -137,6 +137,25 @@ app.get('/api/auth/user', authenticateToken, async (req, res) => {
   }
 });
 
+app.put('/api/user/profile', authenticateToken, async (req, res) => {
+  const { name, email } = req.body;
+
+  try {
+    // Optional: validate email format, etc.
+
+    // Update user info
+    const updatedUser = await pool.query(
+      'UPDATE users SET name = $1, email = $2 WHERE id = $3 RETURNING id, name, email, role',
+      [name, email, req.user.id]
+    );
+
+    res.json(updatedUser.rows[0]);
+  } catch (err) {
+    console.error('Error updating user profile:', err);
+    res.status(500).json({ message: 'Failed to update user profile.' });
+  }
+});
+
 // Clients routes
 app.get('/api/clients', authenticateToken, async (req, res) => {
   try {
@@ -686,6 +705,41 @@ app.post('/api/clients/import', authenticateToken, upload.single('file'), (req, 
   } catch (err) {
     console.error('CSV import error:', err);
     res.status(500).json({ message: 'Server error importing clients.' });
+  }
+});
+app.get('/api/notes', authenticateToken, async (req, res) => {
+  try {
+    const notes = await pool.query(
+      'SELECT * FROM notes WHERE user_id = $1 ORDER BY created_at DESC',
+      [req.user.id]
+    );
+    res.json(notes.rows);
+  } catch (err) {
+    console.error('Error fetching notes:', err);
+    res.status(500).json({ message: 'Failed to fetch notes.' });
+  }
+});
+app.post('/api/notes', authenticateToken, async (req, res) => {
+  const { content } = req.body;
+  try {
+    const newNote = await pool.query(
+      'INSERT INTO notes (user_id, content) VALUES ($1, $2) RETURNING *',
+      [req.user.id, content]
+    );
+    res.status(201).json(newNote.rows[0]);
+  } catch (err) {
+    console.error('Error creating note:', err);
+    res.status(500).json({ message: 'Failed to create note.' });
+  }
+});
+app.delete('/api/notes/:id', authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  try {
+    await pool.query('DELETE FROM notes WHERE id = $1 AND user_id = $2', [id, req.user.id]);
+    res.json({ message: 'Note deleted successfully.' });
+  } catch (err) {
+    console.error('Error deleting note:', err);
+    res.status(500).json({ message: 'Failed to delete note.' });
   }
 });
 

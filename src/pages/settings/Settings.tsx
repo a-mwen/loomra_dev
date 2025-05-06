@@ -1,149 +1,145 @@
-import React from 'react';
-import { Card } from '../../components/common/Card';
-import { Button } from '../../components/common/Button';
-import { Input } from '../../components/common/Input';
-import { useAuth } from '../../context/AuthContext';
-import { useTheme } from '../../context/ThemeContext';
-import { Sun, Moon, Computer } from 'lucide-react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { API_URL } from '../../config/constants';
+import axios from 'axios';
 
 const Settings = () => {
-  const { user } = useAuth();
-  const { theme, setTheme } = useTheme();
-  
-  const [formData, setFormData] = React.useState({
-    firstName: user?.firstName || '',
-    lastName: user?.lastName || '',
-    email: user?.email || '',
-    notifications: {
-      email: true,
-      app: true,
-      taskReminders: true,
-      meetingReminders: true,
-    }
+  const navigate = useNavigate();
+
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    currentPassword: '',
+    newPassword: '',
   });
-  
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle settings update
-    console.log('Settings updated:', formData);
+
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
   };
-  
+
+  const handleSave = async () => {
+    setSubmitting(true);
+    setError('');
+    setSuccess('');
+    try {
+      // Simulate saving profile (replace with real API call)
+      await axios.put(`${API_URL}/user/profile`, {
+        name: form.name,
+        email: form.email,
+      });
+      setSuccess('Profile updated successfully.');
+    } catch (err) {
+      setError('Failed to update profile.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (!form.currentPassword || !form.newPassword) {
+      setError('Both password fields are required.');
+      return;
+    }
+    setSubmitting(true);
+    setError('');
+    setSuccess('');
+    try {
+      // Simulate password change (replace with real API call)
+      await axios.post(`${API_URL}/user/change-password`, {
+        currentPassword: form.currentPassword,
+        newPassword: form.newPassword,
+      });
+      setSuccess('Password changed successfully.');
+      setForm(prev => ({ ...prev, currentPassword: '', newPassword: '' }));
+    } catch (err) {
+      setError('Failed to change password.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    const confirmed = window.confirm('Are you sure you want to delete your account? This action is permanent.');
+    if (!confirmed) return;
+
+    try {
+      await axios.delete(`${API_URL}/user`);
+      navigate('/login');
+    } catch (err) {
+      alert('Failed to delete account.');
+    }
+  };
+
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">Settings</h1>
-      
-      <div className="space-y-6">
-        <Card title="Profile Settings">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input
-                label="First Name"
-                value={formData.firstName}
-                onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-              />
-              <Input
-                label="Last Name"
-                value={formData.lastName}
-                onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-              />
-            </div>
-            <Input
-              label="Email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            />
-            <Button type="submit" variant="primary">
-              Save Changes
-            </Button>
-          </form>
-        </Card>
-        
-        <Card title="Theme">
-          <div className="flex space-x-4">
-            <Button
-              variant={theme === 'light' ? 'primary' : 'outline'}
-              onClick={() => setTheme('light')}
-              leftIcon={<Sun size={16} />}
-            >
-              Light
-            </Button>
-            <Button
-              variant={theme === 'dark' ? 'primary' : 'outline'}
-              onClick={() => setTheme('dark')}
-              leftIcon={<Moon size={16} />}
-            >
-              Dark
-            </Button>
-            <Button
-              variant={theme === 'system' ? 'primary' : 'outline'}
-              onClick={() => setTheme('system')}
-              leftIcon={<Computer size={16} />}
-            >
-              System
-            </Button>
-          </div>
-        </Card>
-        
-        <Card title="Notifications">
-          <div className="space-y-4">
-            <label className="flex items-center space-x-3">
-              <input
-                type="checkbox"
-                checked={formData.notifications.email}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  notifications: { ...formData.notifications, email: e.target.checked }
-                })}
-                className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-              />
-              <span className="text-sm text-gray-700 dark:text-gray-300">Email notifications</span>
-            </label>
-            
-            <label className="flex items-center space-x-3">
-              <input
-                type="checkbox"
-                checked={formData.notifications.app}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  notifications: { ...formData.notifications, app: e.target.checked }
-                })}
-                className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-              />
-              <span className="text-sm text-gray-700 dark:text-gray-300">In-app notifications</span>
-            </label>
-            
-            <label className="flex items-center space-x-3">
-              <input
-                type="checkbox"
-                checked={formData.notifications.taskReminders}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  notifications: { ...formData.notifications, taskReminders: e.target.checked }
-                })}
-                className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-              />
-              <span className="text-sm text-gray-700 dark:text-gray-300">Task reminders</span>
-            </label>
-            
-            <label className="flex items-center space-x-3">
-              <input
-                type="checkbox"
-                checked={formData.notifications.meetingReminders}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  notifications: { ...formData.notifications, meetingReminders: e.target.checked }
-                })}
-                className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-              />
-              <span className="text-sm text-gray-700 dark:text-gray-300">Meeting reminders</span>
-            </label>
-          </div>
-          
-          <div className="mt-4">
-            <Button variant="primary">Save Preferences</Button>
-          </div>
-        </Card>
+    <div className="max-w-3xl mx-auto p-6 space-y-8 animate-fade-in">
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Settings</h1>
+
+      {error && <p className="text-red-600">{error}</p>}
+      {success && <p className="text-green-600">{success}</p>}
+
+      {/* Profile Info */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 space-y-4">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Profile</h2>
+        <input
+          name="name"
+          placeholder="Full Name"
+          value={form.name}
+          onChange={handleChange}
+          className="input"
+        />
+        <input
+          name="email"
+          placeholder="Email Address"
+          value={form.email}
+          onChange={handleChange}
+          className="input"
+        />
+        <button onClick={handleSave} disabled={submitting} className="btn btn-primary">
+          {submitting ? 'Saving...' : 'Save Changes'}
+        </button>
+      </div>
+
+      {/* Change Password */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 space-y-4">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Change Password</h2>
+        <input
+          name="currentPassword"
+          type="password"
+          placeholder="Current Password"
+          value={form.currentPassword}
+          onChange={handleChange}
+          className="input"
+        />
+        <input
+          name="newPassword"
+          type="password"
+          placeholder="New Password"
+          value={form.newPassword}
+          onChange={handleChange}
+          className="input"
+        />
+        <button onClick={handleChangePassword} disabled={submitting} className="btn btn-primary">
+          {submitting ? 'Updating...' : 'Change Password'}
+        </button>
+      </div>
+
+      {/* Theme Toggle Placeholder */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 space-y-4">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Preferences</h2>
+        <p className="text-sm text-gray-600 dark:text-gray-400">Theme settings coming soon...</p>
+      </div>
+
+      {/* Danger Zone */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 space-y-4">
+        <h2 className="text-lg font-semibold text-error-600 dark:text-error-400">Danger Zone</h2>
+        <button onClick={handleDeleteAccount} className="btn btn-outline border-red-500 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10">
+          Delete Account
+        </button>
       </div>
     </div>
   );

@@ -131,8 +131,7 @@ const Dashboard = () => {
         <div className="card bg-white dark:bg-gray-800">
           <div className="flex items-start">
             <div className="p-3 rounded-lg bg-secondary-50 dark:bg-secondary-900/20">
-              <CheckSquare className="h-6 w-6 text-secondary-600 dark:text-secondary-400" />
-            </div>
+            <CheckSquare key="active-tasks-icon" className="h-6 w-6 text-secondary-600 dark:text-secondary-400" />            </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Active Tasks</p>
               <p className="text-2xl font-semibold text-gray-900 dark:text-white">{stats.activeTasks}</p>
@@ -165,8 +164,7 @@ const Dashboard = () => {
         <div className="card bg-white dark:bg-gray-800">
           <div className="flex items-start">
             <div className="p-3 rounded-lg bg-success-50 dark:bg-success-900/20">
-              <CheckSquare className="h-6 w-6 text-success-600 dark:text-success-400" />
-            </div>
+            <CheckSquare key="completed-tasks-icon" className="h-6 w-6 text-success-600 dark:text-success-400" />            </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Completed Tasks</p>
               <p className="text-2xl font-semibold text-gray-900 dark:text-white">{stats.completedTasks}</p>

@@ -1,5 +1,4 @@
-import React from 'react';
-import { Card } from '../../components/common/Card';
+import Card from '../../components/common/Card';
 import { BarChart, LineChart, PieChart, TrendingUp } from 'lucide-react';
 
 const Analytics = () => {
